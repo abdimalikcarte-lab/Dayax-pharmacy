@@ -106,7 +106,7 @@ function restock(id){const p=P(id);form('Receive stock: '+esc(p.name),[{k:'q',l:
 function delP(id){if(confirm('Delete this medicine?')){db.products=db.products.filter(p=>p.id!==id);save();render()}}
 /* ---------- Customers ---------- */
 V.cust=()=>`<div class="row"><b>Receivables: ${m(db.customers.reduce((s,c)=>s+c.debt,0))}</b><button class="pri" onclick="newC()">+ Customer</button></div><div style="height:8px"></div>${db.customers.map(c=>`<div class="card row"><span><b>${esc(c.name)}</b><br><small class="mut">${esc(c.phone||'')}</small></span><span style="text-align:right"><b style="color:${c.debt>0?'var(--bad)':'var(--ok)'}">${m(c.debt)}</b><br>${c.debt>0?`<button class="sm" onclick="pay('${c.id}')">Record payment</button>`:'<small class="mut">No balance</small>'}</span></div>`).join('')||'<p class="mut">No customers yet</p>'}`;
-function newC(){form('New customer',[{k:'name',l:'Full name',r:1},{k:'phone',l:'Phone'}],d=>{db.customers.push({id:uid(),name:d.name,phone:d.phone,debt:0});save();render()})}
+function newC(){form('New customer',[{k:'name',l:'Full name',r:1},{k:'phone',l:'Phone'},{k:'debt',l:'Opening balance owed ($, optional)',t:'number'}],d=>{db.customers.push({id:uid(),name:d.name,phone:d.phone,debt:+d.debt||0});save();render()})}
 function pay(id){const c=C(id);form('Payment from '+esc(c.name),[{k:'a',l:'Amount received',t:'number',v:c.debt,r:1}],d=>{c.debt=Math.max(0,c.debt-+d.a);save();render()})}
 /* ---------- Reports ---------- */
 V.rep=()=>{const inP=t=>period==='all'||(period==='today'?t.slice(0,10)===today():t.slice(0,7)===today().slice(0,7));const S=db.sales.filter(s=>inP(s.t)),E=db.expenses.filter(e=>inP(e.t)),ex=E.reduce((a,e)=>a+e.amt,0),pr=prof(S);
